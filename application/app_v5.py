@@ -28,7 +28,7 @@ parser.add_argument('content-type',
 Representations
  - Adds a response-type into the "Response content type" drop-down menu displayed in Swagger
  - When selected, the APP will return the correct response-header and content type
- - The default for flask-restplus is aspplication/json
+ - The default for flask-restplus is application/json
 """
 # Add additional representations using the @api.representation decorator
 # Requires the module make_response from flask and dicttoxml
@@ -87,7 +87,7 @@ class NameClass(Resource):
     @api.doc(parser=parser)
     def get(self, name):
 
-        # Collect Arguements
+        # Collect Arguments
         args = parser.parse_args()
 
         # Overides the default response route so that the standard HTML URL can return any specified format
