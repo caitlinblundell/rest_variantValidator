@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource
 from utils import request_parser
 from utils import representations
+from logger import logger
 
 
 """
@@ -33,18 +34,23 @@ class HelloClass(Resource):
         # Overrides the default response route so that the standard HTML URL can return any specified format
         if args['content-type'] == 'application/json':
             # example: http://127.0.0.1:5000/name/name/bob?content-type=application/json
+            logger.debug("Returning JSON greeting")
             return representations.application_json({
                 "greeting": "Hello World"
             },
                 200, None)
         # example: http://127.0.0.1:5000/name/name/bob?content-type=text/xml
         elif args['content-type'] == 'text/xml':
+            logger.debug("Returning XML greeting")
             return representations.xml({
                  "greeting": "Hello World"
             },
                 200, None)
         else:
             # Return the api default output
+            logger.warning(
+                "Default output used due to unrecognized content-type"
+            )
             return {
                  "greeting": "Hello World"
             }

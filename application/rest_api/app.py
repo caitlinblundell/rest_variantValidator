@@ -8,30 +8,13 @@ from endpoints import api
 from utils import request_parser
 from utils import representations
 from utils import exceptions 
-import logging
-from logging import handlers
 import time
+from logger import logger
 
 
-"""
-Logging
-"""
-logger = logging.getLogger('rest_api')
-# We are setting 2 types of logging. To screen at the level DEBUG
-logger.setLevel(logging.INFO)
 
-# We will also log to a file
-# Log with a rotating file-handler. This sets the maximum size of the log to 0.5Mb and allows two additional logs
-# The logs are then deleted and replaced in rotation
-logHandler = handlers.RotatingFileHandler('rest_api.log', maxBytes=500000, backupCount=2)
-# We want to minimise the amount of information we log to capturing bugs
-logHandler.setLevel(logging.ERROR)
-logger.addHandler(logHandler)
+## Create a parser object locally
 
-
-"""
-Create a parser object locally
-"""
 parser = request_parser.parser
 
 # Define the application as a Flask app with the name defined by __name__ (i.e. the name of the current module)
@@ -44,16 +27,42 @@ api.init_app(application)
 # By default, show all endpoints (collapsed)
 application.config.SWAGGER_UI_DOC_EXPANSION = 'list'
 
+@api.param("select_transcripts", "***'all'***\n"
+                                 ">   Return all possible transcripts\n"
+                                 "\n***Single***\n"
+                                 ">   NM_000093.4\n"
+                                 "\n***Multiple***\n"
+                                 ">   NM_000093.4|NM_001278074.1|NM_000093.3")
+@api.param("variant_description", "***HGVS***\n"
+                                  ">   NM_000088.3:c.589G>T\n"
+                                  ">   NC_000017.10:g.48275363C>A\n"
+                                  ">   NG_007400.1:g.8638G>T\n"
+                                  ">   LRG_1:g.8638G>T\n"
+                                  ">   LRG_1t1:c.589G>T\n"
+                                  "\n***Pseudo-VCF***\n"
+                                  ">   17-50198002-C-A\n"
+                                  ">   17:50198002:C:A\n"
+                                  ">   GRCh38-17-50198002-C-A\n"
+                                  ">   GRCh38:17:50198002:C:A\n"
+                                  "\n***Hybrid***\n"
+                                  ">   chr17:50198002C>A\n "
+                                  ">   chr17:50198002C>A(GRCh38)\n"
+                                  ">   chr17:g.50198002C>A\n"
+                                  ">   chr17:g.50198002C>A(GRCh38)")
+@api.param("genome_build", "***Accepted:***\n"
+                           ">   GRCh37\n"
+                           ">   GRCh38\n"
+                           ">   hg19\n"
+                           ">   hg38")
 
-"""
-Representations
- - Adds a response-type into the "Response content type" drop-down menu displayed in Swagger
- - When selected, the APP will return the correct response-header and content type
- - The default for flask-RESTPlus is application/json
- 
-Note 
- - The decorators are assigned to the functions
-"""
+
+# Representations
+# - Adds a response-type into the "Response content type" drop-down menu displayed in Swagger
+# - When selected, the APP will return the correct response-header and content type
+# - The default for flask-RESTPlus is application/json
+# Note: The decorators are assigned to the functions
+
+
 # Add additional representations using the @api.representation decorator
 # Requires the module make_response from flask and dict-to-xml
 

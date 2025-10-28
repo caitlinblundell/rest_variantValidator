@@ -4,6 +4,7 @@ from utils import representations
 import requests
 from requests.exceptions import ConnectionError
 from utils import exceptions
+from logger import logger
 
 """
 Create a parser object locally
@@ -52,12 +53,16 @@ class VariantValidatorClass(Resource):
                         variant_description,
                         select_transcripts
                         ])
+        logger.debug(f"Requesting VariantValidator URL: {url}")
         try:
             validation = requests.get(url)
         except ConnectionError:
+            logger.error("VariantValidator API request failed due to connection error")
             raise exceptions.RemoteConnectionError('https://rest.variantvalidator.org/VariantValidator/variantvalidator currently '
                                                    'unavailable')
         content = validation.json()
+        logger.debug("VariantValidator API request succeeded")
+
 
         # Collect Arguments
         args = parser.parse_args()
@@ -65,10 +70,15 @@ class VariantValidatorClass(Resource):
         # Overrides the default response route so that the standard HTML URL can return any specified format
         if args['content-type'] == 'application/json':
             # example: http://127.0.0.1:5000.....bob?content-type=application/json
+            logger.debug("Returning JSON response")
             return representations.application_json(content, 200, None)
         # example: http://127.0.0.1:5000.....?content-type=text/xml
         elif args['content-type'] == 'text/xml':
+            logger.debug("Returning XML response")
             return representations.xml(content, 200, None)
         else:
             # Return the api default output
+            logger.warning(
+                "Default output used due to unrecognized content-type"
+            )
             return content
