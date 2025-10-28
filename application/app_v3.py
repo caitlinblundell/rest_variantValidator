@@ -5,7 +5,7 @@ Simple rest interface for VariantVlidator built using Flask Flask-RESTX and Swag
 # Import modules
 from flask import Flask
 from flask_restx import Api, Resource
-import _____
+import requests
 
 # Define the application as a Flask app with the name defined by __name__ (i.e. the name of the current module)
 # Most tutorials define application as "app", but I have had issues with this when it comes to deployment,
@@ -35,15 +35,15 @@ class NameClass(Resource):
         }
 
 vv_space = api.namespace('VariantValidator', description='VariantValidator APIs')
-@vv_space.route("/variantvalidator/_____")
+@vv_space.route("/variantvalidator/<string:transcript_id>")
 class VariantValidatorClass(Resource):
-    def get(self, _____):
+    def get(self, transcript_id):
 
         # Make a request to the curent VariantValidator rest-API
-        url = _____
-        validation = _____
-        content = _____
-        return _____
+        url = "/".join(['https://rest.variantvalidator.org/VariantValidator/tools/gene2transcripts/', transcript_id]) # create url from parameters for api get request
+        validation = requests.get(url) # use requests module to make request
+        content = validation.json() # get the json content from the response
+        return content
 
 # Allows app to be run in debug mode
 if __name__ == '__main__':
